@@ -21,7 +21,7 @@ actions = np.array(os.listdir(PATH))
 model = load_model('my_model.keras')
 
 # Create an instance of the grammar correction tool
-tool = language_tool_python.LanguageToolPublicAPI('en-UK')
+# tool = language_tool_python.LanguageToolPublicAPI('en-UK')
 
 # Initialize the lists
 sentence, keypoints, last_prediction, grammar, grammar_result = [], [], [], [], []
@@ -92,7 +92,7 @@ with mp.solutions.holistic.Holistic(min_detection_confidence=0.75, min_tracking_
             # Record the words in the sentence list into a single string
             text = ' '.join(sentence)
             # Apply grammar correction tool and extract the corrected result
-            grammar_result = tool.correct(text)
+            # grammar_result = tool.correct(text)
 
         if grammar_result:
             # Calculate the size of the text to be displayed and the X coordinate for centering the text on the image
@@ -125,4 +125,4 @@ with mp.solutions.holistic.Holistic(min_detection_confidence=0.75, min_tracking_
     cv2.destroyAllWindows()
 
     # Shut off the server
-    tool.close()
+    # tool.close()
