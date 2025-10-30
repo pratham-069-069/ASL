@@ -1,0 +1,25 @@
+# Python virtual environment
+.venv/
+venv/
+*.env
+
+# Python cache and compiled files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Saved Machine Learning Models
+# Ignoring the .keras file I see in your project
+*.keras
+*.h5
+*.pb
+*.model
+
+# IDE and Editor specific
+.vscode/
+.idea/
+
+# OS-generated files
+.DS_Store
+Thumbs.db
