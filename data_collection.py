@@ -54,7 +54,31 @@ def get_user_action_choice(actions, path, total_sequences):
         try:
             choice_num = int(choice)
             if 1 <= choice_num <= len(actions):
-                return actions[choice_num - 1]
+                selected_action = actions[choice_num - 1]
+                existing_count = count_existing_sequences(selected_action, path)
+                
+                # If the letter already has data, ask for confirmation
+                if existing_count > 0:
+                    print(f"\nLetter '{selected_action.upper()}' already has {existing_count}/{total_sequences} sequences recorded.")
+                    if existing_count >= total_sequences:
+                        print("This letter is already complete!")
+                        print("Options:")
+                        print("1. Continue anyway (will restart from sequence 0)")
+                        print("2. Choose a different letter")
+                        confirm_choice = input("Enter your choice (1 or 2): ").strip()
+                        if confirm_choice == '1':
+                            return selected_action
+                        else:
+                            continue
+                    else:
+                        print(f"Do you want to continue recording from sequence {existing_count}? (y/n)")
+                        confirm = input("> ").strip().lower()
+                        if confirm in ['y', 'yes']:
+                            return selected_action
+                        else:
+                            continue
+                else:
+                    return selected_action
             else:
                 print(f"Please enter a number between 1 and {len(actions)}")
         except ValueError:
@@ -68,12 +92,26 @@ if selected_action is None:
 
 # Count existing sequences for the selected action
 existing_count = count_existing_sequences(selected_action, PATH)
+start_sequence = existing_count
+
 print(f"\nSelected: '{selected_action.upper()}'")
 print(f"Existing sequences: {existing_count}/{sequences}")
-print(f"Will record sequences {existing_count} to {sequences-1}")
 
-# Create directories for remaining sequences
-for sequence in range(existing_count, sequences):
+# If letter is complete, ask if user wants to restart
+if existing_count >= sequences:
+    print("This letter is already complete. Starting from sequence 0...")
+    start_sequence = 0
+    # Remove existing data if restarting
+    import shutil
+    action_path = os.path.join(PATH, selected_action)
+    if os.path.exists(action_path):
+        shutil.rmtree(action_path)
+    existing_count = 0
+
+print(f"Will record sequences {start_sequence} to {sequences-1}")
+
+# Create directories for sequences to be recorded
+for sequence in range(start_sequence, sequences):
     try:
         os.makedirs(os.path.join(PATH, selected_action, str(sequence)))
     except:
@@ -91,7 +129,7 @@ should_exit = False
 # Create a MediaPipe Holistic object for hand tracking and landmark extraction
 with mp.solutions.holistic.Holistic(min_detection_confidence=0.75, min_tracking_confidence=0.75) as holistic:
     # Loop through remaining sequences and frames to record data
-    for sequence in range(existing_count, sequences):
+    for sequence in range(start_sequence, sequences):
         if should_exit:
             break
             
